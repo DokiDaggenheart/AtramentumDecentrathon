@@ -6,13 +6,13 @@ using Zenject;
 public class PlayerCarBinder : MonoBehaviour
 {
     [SerializeField] private Transform carBody;
-    [SerializeField] private Transform[] carWheels; // Все колеса
-    [SerializeField] private Collider[] rearWheelColliders; // Коллайдеры задних колес
-    [SerializeField] private float raycastLength = 0.5f; // Длина рейкаста
+    [SerializeField] private Transform[] carWheels;
+    [SerializeField] private Collider[] rearWheelColliders; 
     [Header("Car Settings")]
     [SerializeField] private float maxSpeed = 100f;
     [SerializeField] private float acceleration = 30f;
-    [SerializeField] private float brakeForce = 50f;
+    [SerializeField] private float activeBrakeForce = 50f;
+    [SerializeField] private float passiveBrakeForce = 20f;
     [SerializeField] private float turnSpeed = 5f;
 
     private PlayerCarController _carController;
@@ -27,14 +27,7 @@ public class PlayerCarBinder : MonoBehaviour
     {
         Rigidbody rb = carBody.GetComponent<Rigidbody>();
 
-        // Создаем объекты проверки касания задних колес
-        WheelContactChecker[] rearWheelCheckers = new WheelContactChecker[rearWheelColliders.Length];
-        for (int i = 0; i < rearWheelColliders.Length; i++)
-        {
-            rearWheelCheckers[i] = new WheelContactChecker(rearWheelColliders[i], raycastLength);
-        }
-
-        CarModel model = new CarModel(carBody, carWheels, rearWheelCheckers, rb, maxSpeed, acceleration, brakeForce, turnSpeed);
+        CarModel model = new CarModel(carBody, carWheels, rb, maxSpeed, acceleration, activeBrakeForce, passiveBrakeForce, turnSpeed);
         _carController.Initialize(model);
     }
 

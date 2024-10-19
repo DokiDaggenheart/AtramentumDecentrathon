@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class PlayerCarController : CarControllerBase
 {
-    private CarModel _model;
+    private new CarModel _model;
     private float _moveInput;
     private float _turnInput;
 
-    public void Initialize(CarModel model)
+    public override void Initialize(CarModel model)
     {
         _model = model;
     }
@@ -32,7 +32,11 @@ public class PlayerCarController : CarControllerBase
         }
         else if (_moveInput < 0)
         {
-            _model.Brake(); 
+            _model.Brake(true);
+        }
+        else
+        {
+            _model.Brake(false);
         }
         _model.Turn(_turnInput * _model.turnSpeed);
     }

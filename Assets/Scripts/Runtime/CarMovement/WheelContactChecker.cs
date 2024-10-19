@@ -5,28 +5,31 @@ using UnityEngine;
 public class WheelContactChecker
 {
     private readonly Collider _wheelCollider;
-    private readonly float _raycastLength;
     private bool _isGrounded;
 
-    public WheelContactChecker(Collider wheelCollider, float raycastLength)
+    public WheelContactChecker(Collider wheelCollider)
     {
         _wheelCollider = wheelCollider;
-        _raycastLength = raycastLength;
     }
 
     public bool IsGrounded
     {
         get
         {
-            CheckContact();
             return _isGrounded;
         }
     }
-
-    private void CheckContact()
+    public void OnCollisionStay(Collision collision)
     {
-        Ray ray = new Ray(_wheelCollider.bounds.center, Vector3.down);
-        _isGrounded = Physics.Raycast(ray, _raycastLength);
+        if (collision.collider != null)
+        {
+            _isGrounded = true;
+        }
+    }
+    public void OnCollisionExit(Collision collision)
+    {
+        _isGrounded = false;
     }
 }
+
 

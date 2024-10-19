@@ -6,6 +6,9 @@ public class GameInstallers : MonoInstaller
     {
         Container.Bind<PlayerCarController>().AsSingle();
         Container.Bind<AICarController>().AsTransient();
+        Container.Bind<RaceManager>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<PlayerCarBinder>().FromComponentInHierarchy().AsSingle();
+        Container.Bind<RubberBandingSystem>().FromComponentInHierarchy().AsSingle();
     }
 }
 

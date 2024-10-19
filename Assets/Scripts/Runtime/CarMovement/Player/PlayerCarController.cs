@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PlayerCarController : CarControllerBase
 {
-    private new CarModel _model;
     private float _moveInput;
     private float _turnInput;
 
@@ -28,7 +27,7 @@ public class PlayerCarController : CarControllerBase
     {
         if (_moveInput > 0)
         {
-            _model.Accelerate();
+            _model.Accelerate(_model.maxSpeed);
         }
         else if (_moveInput < 0)
         {

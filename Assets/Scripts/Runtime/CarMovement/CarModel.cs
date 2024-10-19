@@ -6,20 +6,25 @@ public class CarModel
 {
     public Transform carBody;
     public Transform[] wheels;
-    private Rigidbody _rigidbody;
-    public float maxSpeed = 50f;
-    public float acceleration = 15f;
-    public float activeBrakeStrength = 30f;
-    public float passiveBrakeStrength = 30f;
-    public float turnSpeed = 10f;
+    private Rigidbody _rigidBody;
+    public readonly float maxSpeed = 50f;
+    public readonly float acceleration = 15f;
+    public readonly float activeBrakeStrength;
+    public readonly float passiveBrakeStrength;
+    public readonly float turnSpeed;
 
     private float _currentSpeed;
+
+    public int currentCheckpointIndex;
+    public int totalCheckpoints;
+    public int currentLap = 0;
+    public bool raceFinished = false;
 
     public CarModel(Transform body, Transform[] wheels, Rigidbody rb, float maxSpeed, float acceleration, float activeBrakeForce, float passiveBrakeForce, float turnSpeed)
     {
         carBody = body;
         this.wheels = wheels;
-        _rigidbody = rb;
+        _rigidBody = rb;
         this.maxSpeed = maxSpeed;
         this.acceleration = acceleration;
         this.activeBrakeStrength = activeBrakeForce;
@@ -27,15 +32,19 @@ public class CarModel
         this.turnSpeed = turnSpeed;
     }
 
-    public void Accelerate()
+    public void Accelerate(float maxSpeed)
     {
+        if (_currentSpeed > maxSpeed)
+        {
+            Brake(false);
+            return;
+        }
         if (_currentSpeed < maxSpeed)
         {
             _currentSpeed += acceleration * Time.deltaTime;
         }
-
         Vector3 forward = carBody.forward * _currentSpeed;
-        _rigidbody.velocity = new Vector3(forward.x, _rigidbody.velocity.y, forward.z);
+        _rigidBody.velocity = new Vector3(forward.x, _rigidBody.velocity.y, forward.z);
         RotateWheels(_currentSpeed);
     }
 
@@ -48,7 +57,7 @@ public class CarModel
             brakeStrength = passiveBrakeStrength;
         _currentSpeed = Mathf.Max(_currentSpeed - brakeStrength * Time.deltaTime, 0);
         Vector3 forward = carBody.forward * _currentSpeed;
-        _rigidbody.velocity = new Vector3(forward.x, _rigidbody.velocity.y, forward.z);
+        _rigidBody.velocity = new Vector3(forward.x, _rigidBody.velocity.y, forward.z);
         RotateWheels(_currentSpeed);
     }
 
@@ -56,6 +65,12 @@ public class CarModel
     {
         RotateFrontWheels(steeringAngle);
         carBody.Rotate(Vector3.up, steeringAngle * Time.deltaTime);
+        float speedReductionFactor = 1 - Mathf.Abs(steeringAngle) / turnSpeed;
+        speedReductionFactor = Mathf.Clamp(speedReductionFactor, 0.8f, 1f);
+        Vector3 currentVelocity = _rigidBody.velocity;
+        Vector3 forwardVelocity = carBody.forward * Vector3.Dot(currentVelocity, carBody.forward);
+        forwardVelocity *= speedReductionFactor;
+        _rigidBody.velocity = new Vector3(forwardVelocity.x, currentVelocity.y, forwardVelocity.z);
     }
 
     private void RotateWheels(float speed)
@@ -72,4 +87,8 @@ public class CarModel
         wheels[1].localRotation = Quaternion.Euler(0, steeringAngle, 0);
     }
 
+    public void passCheckpoint(int newIndex)
+    {
+        currentCheckpointIndex = newIndex;
+    }
 }

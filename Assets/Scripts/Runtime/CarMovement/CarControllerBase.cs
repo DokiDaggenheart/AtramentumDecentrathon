@@ -10,7 +10,10 @@ public abstract class CarControllerBase : IUpdatable
     {
         _model = model;
     }
-
+    public virtual void OnCheckpointPassed(int newIndex)
+    {
+        _model.passCheckpoint(newIndex);
+    }
     public abstract void OnUpdate();
 }
 
